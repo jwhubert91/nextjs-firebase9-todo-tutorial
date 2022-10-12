@@ -1,12 +1,21 @@
 import React, { useState } from "react"
-import { Container, Snackbar, Alert } from "@mui/material"
+import {
+  Container,
+  Snackbar,
+  Alert,
+  Box,
+  Avatar,
+  Typography,
+  IconButton,
+} from "@mui/material"
 import TodoForm from "../components/TodoForm"
 import TodoList from "../components/TodoList"
 import { TodoContext } from "../todoContext"
-import Loading from "../components/Loading"
-import Login from "../components/Login"
+import { useAuth } from "../Auth"
+import { auth } from "../firebase"
 
 export default function Home() {
+  const { currentUser } = useAuth()
   const [todo, setTodo] = useState({ title: "", detail: "" })
   const [isPending, setIsPending] = useState(false)
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false)
@@ -28,6 +37,19 @@ export default function Home() {
   return (
     <TodoContext.Provider value={{ showAlert, todo, setTodo }}>
       <Container maxWidth="sm" sx={{ paddingTop: 1, paddingBottom: 5 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 2,
+          }}
+        >
+          <IconButton onClick={() => auth.signOut()}>
+            <Avatar src={currentUser.photoURL} />
+          </IconButton>
+          <Typography variant="h5">{currentUser.displayName}</Typography>
+        </Box>
         <TodoForm setIsPending={setIsPending} />
         <Snackbar
           open={isSnackbarOpen}
