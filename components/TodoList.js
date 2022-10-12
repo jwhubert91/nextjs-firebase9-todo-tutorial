@@ -1,12 +1,29 @@
 import React, { useState, useEffect } from "react"
 import { db } from "../firebase"
-import { collection, query, onSnapshot } from "firebase/firestore"
+import {
+  collection,
+  query,
+  onSnapshot,
+  where,
+  orderBy,
+} from "firebase/firestore"
 import Todo from "./Todo"
+import { useAuth } from "../Auth"
 
 const TodoList = () => {
   const [todos, setTodos] = useState([])
+  const { currentUser } = useAuth()
   useEffect(() => {
-    const q = query(collection(db, "todos"))
+    // const q = query(
+    //   collection(db, "todos", where("email", "==", currentUser.email)),
+    //   orderBy("timestamp", "desc")
+    // )
+    const todosRef = collection(db, "todos")
+    const q = query(
+      todosRef,
+      where("email", "==", currentUser?.email),
+      orderBy("timestamp", "desc")
+    )
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const results = []
       querySnapshot.forEach((doc) => {

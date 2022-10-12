@@ -9,10 +9,12 @@ import {
 } from "firebase/firestore"
 import { db } from "../firebase"
 import { TodoContext } from "../todoContext"
+import { useAuth } from "../Auth"
 
 const TodoForm = ({ setIsPending }) => {
   const { showAlert, todo, setTodo } = useContext(TodoContext)
   const inputAreaRef = useRef()
+  const { currentUser } = useAuth()
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsPending(true)
@@ -28,6 +30,7 @@ const TodoForm = ({ setIsPending }) => {
       await addDoc(collection(db, "todos"), {
         ...todo,
         timestamp: serverTimestamp(),
+        email: currentUser.email,
       }).then(() => {
         showAlert("success", `Todo "${todo.title}" successfully added`)
         setTodo({
@@ -42,10 +45,7 @@ const TodoForm = ({ setIsPending }) => {
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
       if (!inputAreaRef.current.contains(e.target)) {
-        console.log("Outside input area")
         setTodo({ title: "", detail: "" })
-      } else {
-        console.log("Inside input area")
       }
     }
     document.addEventListener("mousedown", checkIfClickedOutside)

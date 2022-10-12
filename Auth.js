@@ -21,8 +21,6 @@ export const AuthProvider = ({ children }) => {
       const token = await user.getIdToken()
       setCurrentUser(user)
       setIsLoading(false)
-      console.log("token", token)
-      console.log("user", user)
     })
   }, [])
   if (isLoading) {
