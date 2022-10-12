@@ -5,6 +5,7 @@ import TodoList from "../components/TodoList"
 import { TodoContext } from "../todoContext"
 
 export default function Home() {
+  const [todo, setTodo] = useState({ title: "", detail: "" })
   const [isPending, setIsPending] = useState(false)
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false)
   const [alertType, setAlertType] = useState("success")
@@ -24,7 +25,7 @@ export default function Home() {
   }
 
   return (
-    <TodoContext.Provider value={{ showAlert }}>
+    <TodoContext.Provider value={{ showAlert, todo, setTodo }}>
       <Container maxWidth="sm" sx={{ paddingTop: 1, paddingBottom: 5 }}>
         {isPending ? (
           <p>Loading...</p>

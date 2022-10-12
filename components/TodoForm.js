@@ -1,38 +1,74 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useRef, useEffect } from "react"
 import { TextField, Button } from "@mui/material"
-import { collection, addDoc, serverTimestamp } from "firebase/firestore"
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore"
 import { db } from "../firebase"
 import { TodoContext } from "../todoContext"
 
 const TodoForm = ({ setIsPending }) => {
-  const [todo, setTodo] = useState({ title: "", detail: "" })
-  const { showAlert } = useContext(TodoContext)
+  const { showAlert, todo, setTodo } = useContext(TodoContext)
+  const inputAreaRef = useRef()
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsPending(true)
-    await addDoc(collection(db, "todos"), {
-      ...todo,
-      timestamp: serverTimestamp(),
-    }).then(() => {
-      showAlert("success", `Todo "${todo.title}" successfully added`)
-      setTodo({
-        title: "",
-        detail: "",
+    if (todo?.hasOwnProperty("timestamp")) {
+      // update todo
+      const docRef = doc(db, "todos", todo.id)
+      const todoUpdated = { ...todo, timestamp: serverTimestamp() }
+      updateDoc(docRef, todoUpdated)
+      setTodo({ title: "", detail: "" })
+      showAlert("info", `Todo with id ${todo.id} updated`)
+    } else {
+      // add new todo
+      await addDoc(collection(db, "todos"), {
+        ...todo,
+        timestamp: serverTimestamp(),
+      }).then(() => {
+        showAlert("success", `Todo "${todo.title}" successfully added`)
+        setTodo({
+          title: "",
+          detail: "",
+        })
       })
-      setIsPending(false)
-    })
+    }
+    setIsPending(false)
   }
+
+  useEffect(() => {
+    const checkIfClickedOutside = (e) => {
+      if (!inputAreaRef.current.contains(e.target)) {
+        console.log("Outside input area")
+        setTodo({ title: "", detail: "" })
+      } else {
+        console.log("Inside input area")
+      }
+    }
+    document.addEventListener("mousedown", checkIfClickedOutside)
+    return () => {
+      document.removeEventListener("mousedown", checkIfClickedOutside)
+    }
+  }, [])
+
   return (
     <div
       style={{
         padding: "20px 10px",
         border: "1px solid blue",
-        borderRadius: "10px",
       }}
+      ref={inputAreaRef}
     >
       <pre>{JSON.stringify(todo)}</pre>
       <TextField
         fullWidth
+        style={{
+          background: "white",
+          padding: "5px",
+        }}
         label="title"
         margin="normal"
         value={todo.title}
@@ -40,6 +76,10 @@ const TodoForm = ({ setIsPending }) => {
       />
       <TextField
         fullWidth
+        style={{
+          background: "white",
+          padding: "5px",
+        }}
         label="detail"
         multiline
         maxRows={4}
@@ -47,7 +87,7 @@ const TodoForm = ({ setIsPending }) => {
         onChange={(e) => setTodo({ ...todo, detail: e.target.value })}
       />
       <Button sx={{ mt: 1 }} variant="contained" onClick={handleSubmit}>
-        Add new todo
+        {todo.hasOwnProperty("timestamp") ? "Update todo" : "Create todo"}
       </Button>
     </div>
   )

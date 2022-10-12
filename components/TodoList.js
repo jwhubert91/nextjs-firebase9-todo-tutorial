@@ -26,7 +26,13 @@ const TodoList = () => {
     <div>
       <h1>NextJS Firebase9 Todo List</h1>
       {todos.map((todo) => (
-        <Todo key={todo.id} todo={todo} />
+        <Todo
+          key={todo.id}
+          id={todo.id}
+          title={todo.title}
+          detail={todo.detail}
+          timestamp={todo.timestamp}
+        />
       ))}
     </div>
   )

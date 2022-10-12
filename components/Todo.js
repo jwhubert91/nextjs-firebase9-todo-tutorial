@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import * as dayjs from "dayjs"
 import { IconButton, ListItem, ListItemText } from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
@@ -7,11 +7,10 @@ import { deleteDoc, doc } from "firebase/firestore"
 import { db } from "../firebase"
 import { TodoContext } from "../todoContext"
 
-const Todo = ({ todo }) => {
-  const { id, timestamp, title, detail } = todo
+const Todo = ({ id, timestamp, title, detail }) => {
   const jsTimestamp = timestamp?.toDate()
 
-  const { showAlert } = useContext(TodoContext)
+  const { showAlert, setTodo } = useContext(TodoContext)
 
   const deleteTodo = async (id, e) => {
     e.stopPropagation()
@@ -22,8 +21,16 @@ const Todo = ({ todo }) => {
   }
   return (
     <ListItem
+      onClick={() =>
+        setTodo({
+          title,
+          detail,
+          timestamp,
+          id,
+        })
+      }
       sx={{ mt: 3, boxShadow: 3 }}
-      style={{ backgroundColor: "#FAFAFA" }}
+      style={{ backgroundColor: "#FAFAFA", cursor: "pointer" }}
       secondaryAction={
         <>
           <IconButton onClick={(e) => deleteTodo(id, e)}>
@@ -38,6 +45,9 @@ const Todo = ({ todo }) => {
       <ListItemText
         primary={title}
         secondary={dayjs(jsTimestamp).format("MMMM D, YYYY")}
+        style={{
+          color: "black",
+        }}
       />
     </ListItem>
   )
