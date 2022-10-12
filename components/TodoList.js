@@ -10,14 +10,13 @@ import {
 import Todo from "./Todo"
 import { useAuth } from "../Auth"
 
-const TodoList = () => {
+const TodoList = ({ todosProps }) => {
   const [todos, setTodos] = useState([])
   const { currentUser } = useAuth()
   useEffect(() => {
-    // const q = query(
-    //   collection(db, "todos", where("email", "==", currentUser.email)),
-    //   orderBy("timestamp", "desc")
-    // )
+    setTodos(JSON.parse(todosProps))
+  }, [])
+  useEffect(() => {
     const todosRef = collection(db, "todos")
     const q = query(
       todosRef,
@@ -39,6 +38,7 @@ const TodoList = () => {
     })
     return unsubscribe
   }, [])
+  console.log(todos)
   return (
     <div>
       <h1>NextJS Firebase9 Todo List</h1>

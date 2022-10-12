@@ -9,7 +9,7 @@ import { TodoContext } from "../todoContext"
 import { useRouter } from "next/router"
 
 const Todo = ({ id, timestamp, title, detail }) => {
-  const jsTimestamp = timestamp?.toDate()
+  const jsTimestamp = new Date(timestamp)
 
   const { showAlert, setTodo } = useContext(TodoContext)
   const router = useRouter()
@@ -52,7 +52,7 @@ const Todo = ({ id, timestamp, title, detail }) => {
     >
       <ListItemText
         primary={title}
-        secondary={dayjs(jsTimestamp).format("MMMM D, YYYY")}
+        secondary={jsTimestamp.toDateString()}
         style={{
           color: "black",
         }}
